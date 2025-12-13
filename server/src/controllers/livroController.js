@@ -1,5 +1,6 @@
 import Livro from "../models/Livro.js";
 import { Autor } from "../models/Autor.js"
+import { Editora } from "../models/Editora.js"
 
 export default class LivroController {
 
@@ -32,10 +33,14 @@ export default class LivroController {
         const { titulo, editora, paginas, preco, autor } = req.body;
         try {
             const autorEncontrado = await Autor.findById(autor);
+            const editoraEncontrada = await Editora.findById(editora);
+            
             if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" })
+            if (!editoraEncontrada) return res.status(404).send({ message: "Editora não encontrada" })
+                
             const livroCompleto = {
                 titulo,
-                editora,
+                editora: editoraEncontrada,
                 paginas,
                 preco,
                 autor: { ...autorEncontrado._doc }

@@ -1,4 +1,4 @@
-import Editora from "../models/Editora.js";
+import { Editora } from "../models/Editora.js";
 
 export default class EditoraController {
 

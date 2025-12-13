@@ -8,4 +8,4 @@ const editoraSchema = new mongoose.Schema({
 
 const Editora = mongoose.model('editoras', editoraSchema);
 
-export default Editora; 
+export { Editora, editoraSchema }; 

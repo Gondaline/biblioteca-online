@@ -1,4 +1,4 @@
-import Autor from "../models/Autor.js";
+import { Autor } from "../models/Autor.js";
 
 export default class AutorController {
 
@@ -17,7 +17,7 @@ export default class AutorController {
     static async listarID(req, res) {
         try {
             const id = req.params.id;
-            const data = await Autor.findById({_id: id});
+            const data = await Autor.findById({ _id: id });
             return res.status(200).json(data)
         } catch (err) {
             res.status(500).json({

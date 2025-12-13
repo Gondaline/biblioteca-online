@@ -1,4 +1,5 @@
 import Livro from "../models/Livro.js";
+import { Autor } from "../models/Autor.js"
 
 export default class LivroController {
 
@@ -28,17 +29,21 @@ export default class LivroController {
     };
 
     static async adicionar(req, res) {
-        const { titulo, editora, paginas, preco } = req.body
+        const { titulo, editora, paginas, preco, autor } = req.body;
         try {
-            const data = await Livro.create({
+            const autorEncontrado = await Autor.findById(autor);
+            if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" })
+            const livroCompleto = {
                 titulo,
                 editora,
                 paginas,
-                preco
-            })
+                preco,
+                autor: { ...autorEncontrado._doc }
+            };
+            const livroCriado = await Livro.create(livroCompleto);
             return res.status(201).json({
                 message: "Livro criado com sucesso",
-                livro: data
+                livro: livroCriado
             });
         } catch (err) {
             res.status(500).json({

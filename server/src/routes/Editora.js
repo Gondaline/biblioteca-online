@@ -1,5 +1,5 @@
 import { Router } from "express";
-import EditoraController from "../controllers/editoraController.js"
+import EditoraController from "../controllers/editoraController.js";
 
 const router = Router();
 

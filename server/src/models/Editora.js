@@ -6,6 +6,6 @@ const editoraSchema = new mongoose.Schema({
     anoFuncao: { type: Date, required: true }
 }, { versionKey: false });
 
-const Editora = mongoose.model('editoras', editoraSchema);
+const Editora = mongoose.model("editoras", editoraSchema);
 
 export { Editora, editoraSchema }; 

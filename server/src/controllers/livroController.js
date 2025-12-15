@@ -1,6 +1,6 @@
 import Livro from "../models/Livro.js";
-import { Autor } from "../models/Autor.js"
-import { Editora } from "../models/Editora.js"
+import { Autor } from "../models/Autor.js";
+import { Editora } from "../models/Editora.js";
 
 export default class LivroController {
 
@@ -12,7 +12,7 @@ export default class LivroController {
             res.status(500).send({
                 message: "Erro ao consultar livros",
                 error: err.message
-            })
+            });
         }
     };
 
@@ -20,7 +20,7 @@ export default class LivroController {
         try {
             const id = req.params.id;
             const data = await Livro.findById({ _id: id });
-            return res.status(200).json(data)
+            return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({
                 message: "Erro ao consultar livro",
@@ -35,8 +35,8 @@ export default class LivroController {
             const autorEncontrado = await Autor.findById(autor);
             const editoraEncontrada = await Editora.findById(editora);
 
-            if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" })
-            if (!editoraEncontrada) return res.status(404).send({ message: "Editora não encontrada" })
+            if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" });
+            if (!editoraEncontrada) return res.status(404).send({ message: "Editora não encontrada" });
 
             const livroCompleto = {
                 titulo,
@@ -48,7 +48,7 @@ export default class LivroController {
             const livroCriado = await Livro.create(livroCompleto);
             return res.status(201).json({
                 message: "Livro criado com sucesso",
-                livro: livroCriado
+                livro: livroCriado,
             });
         } catch (err) {
             res.status(500).json({
@@ -102,10 +102,9 @@ export default class LivroController {
             return res.status(200).json(livrosPorEditora);
         } catch (err) {
             res.status(500).json({
-                message: `Erro ao listar livros`,
+                message: "Erro ao listar livros",
                 error: err.message
             });
         }
     };
-
 };

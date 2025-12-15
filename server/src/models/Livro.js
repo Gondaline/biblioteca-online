@@ -10,6 +10,6 @@ const livroSchema = new mongoose.Schema({
     autor: autorSchema
 }, { versionKey: false });
 
-const Livro = mongoose.model('livros', livroSchema);
+const Livro = mongoose.model("livros", livroSchema);
 
 export default Livro;

@@ -18,7 +18,7 @@ export default class AutorController {
         try {
             const id = req.params.id;
             const data = await Autor.findById({ _id: id });
-            return res.status(200).json(data)
+            return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({
                 message: "Erro ao consultar autor",
@@ -28,13 +28,13 @@ export default class AutorController {
     };
 
     static async adicionar(req, res) {
-        const { nome, nacionalidade, qtd_livros_publicados } = req.body
+        const { nome, nacionalidade, qtd_livros_publicados } = req.body;
         try {
             const data = await Autor.create({
                 nome,
                 nacionalidade,
                 qtd_livros_publicados
-            })
+            });
             return res.status(201).json({
                 message: "Autor criado com sucesso",
                 autor: data

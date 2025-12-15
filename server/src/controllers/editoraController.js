@@ -18,7 +18,7 @@ export default class EditoraController {
         try {
             const id = req.params.id;
             const data = await Editora.findById({ _id: id });
-            return res.status(200).json(data)
+            return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({
                 message: "Erro ao consultar editora",
@@ -28,13 +28,13 @@ export default class EditoraController {
     };
 
     static async adicionar(req, res) {
-        const { nome, pais, anoFuncao } = req.body
+        const { nome, pais, anoFuncao } = req.body;
         try {
             const data = await Editora.create({
                 nome,
                 pais,
                 anoFuncao
-            })
+            });
             return res.status(201).json({
                 message: "Autor criado com sucesso",
                 editora: data

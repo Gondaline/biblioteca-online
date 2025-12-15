@@ -16,7 +16,7 @@ export default class LivroController {
         }
     };
 
-    static async listarID(req, res) {
+    static async listarPorID(req, res) {
         try {
             const id = req.params.id;
             const data = await Livro.findById({ _id: id });
@@ -34,13 +34,13 @@ export default class LivroController {
         try {
             const autorEncontrado = await Autor.findById(autor);
             const editoraEncontrada = await Editora.findById(editora);
-            
+
             if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" })
             if (!editoraEncontrada) return res.status(404).send({ message: "Editora não encontrada" })
-                
+
             const livroCompleto = {
                 titulo,
-                editora: editoraEncontrada,
+                editora: { ...editoraEncontrada._doc },
                 paginas,
                 preco,
                 autor: { ...autorEncontrado._doc }
@@ -93,5 +93,19 @@ export default class LivroController {
                 error: err.message
             });
         }
+    }
+
+    static async listarPorEditora(req, res) {
+        const editora = req.query.editora;
+        try {
+            const livrosPorEditora = await Livro.find({ "editora.nome": editora });
+            return res.status(200).json(livrosPorEditora);
+        } catch (err) {
+            res.status(500).json({
+                message: `Erro ao listar livros`,
+                error: err.message
+            });
+        }
     };
+
 };

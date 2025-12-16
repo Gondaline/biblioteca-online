@@ -8,4 +8,4 @@ const autorSchema = new mongoose.Schema({
 
 const Autor = mongoose.model("autores", autorSchema);
 
-export { Autor, autorSchema };
+export default Autor;

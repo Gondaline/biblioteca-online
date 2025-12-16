@@ -1,10 +1,13 @@
-import { Autor } from "../models/Autor.js";
+import Autor from "../models/Autor.js";
 
 export default class AutorController {
 
     static async listar(req, res) {
         try {
-            const data = await Autor.find({});
+            const data = await Autor.find()
+                .populate("autor")
+                .populate("editora")
+                .exec();
             return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({
@@ -17,7 +20,9 @@ export default class AutorController {
     static async listarID(req, res) {
         try {
             const id = req.params.id;
-            const data = await Autor.findById({ _id: id });
+            const data = await Autor.findById(id)
+                .populate("autor")
+                .populate("editora");
             return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({

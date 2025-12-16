@@ -1,10 +1,13 @@
-import { Editora } from "../models/Editora.js";
+import Editora from "../models/Editora.js";
 
 export default class EditoraController {
 
     static async listar(req, res) {
         try {
-            const data = await Editora.find({});
+            const data = await Editora.find()
+                .populate("autor")
+                .populate("editora")
+                .exec();
             return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({
@@ -17,7 +20,9 @@ export default class EditoraController {
     static async listarID(req, res) {
         try {
             const id = req.params.id;
-            const data = await Editora.findById({ _id: id });
+            const data = await Editora.findById(id)
+                .populate("autor")
+                .populate("editora");
             return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({

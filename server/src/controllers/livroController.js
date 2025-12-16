@@ -1,15 +1,19 @@
 import Livro from "../models/Livro.js";
-import { Autor } from "../models/Autor.js";
-import { Editora } from "../models/Editora.js";
+import Autor from "../models/Autor.js";
+import Editora from "../models/Editora.js";
+import validarObjectId from "../auxilies/validarObjectId.js";
 
 export default class LivroController {
 
     static async listar(req, res) {
         try {
-            const data = await Livro.find({});
+            const data = await Livro.find()
+                .populate("autor")
+                .populate("editora");
+
             return res.status(200).json(data);
         } catch (err) {
-            res.status(500).send({
+            return res.status(500).send({
                 message: "Erro ao consultar livros",
                 error: err.message
             });
@@ -19,10 +23,18 @@ export default class LivroController {
     static async listarPorID(req, res) {
         try {
             const id = req.params.id;
-            const data = await Livro.findById({ _id: id });
+            if (!validarObjectId(id)) return res.status(400).json({ message: "ID inválido" });
+
+            const data = await Livro.findById(id)
+                .populate("autor")
+                .populate("editora");
+
+            if (!data) return res.status(404).json({ message: "Livro não encontrado" });
+
             return res.status(200).json(data);
+
         } catch (err) {
-            res.status(500).json({
+            return res.status(500).json({
                 message: "Erro ao consultar livro",
                 error: err.message,
             });
@@ -30,28 +42,29 @@ export default class LivroController {
     };
 
     static async adicionar(req, res) {
-        const { titulo, editora, paginas, preco, autor } = req.body;
         try {
+            const { titulo, editora, paginas, preco, autor } = req.body;
             const autorEncontrado = await Autor.findById(autor);
             const editoraEncontrada = await Editora.findById(editora);
 
+            if (!validarObjectId(autor) || !validarObjectId(editora)) return res.status(400).json({ message: "Autor ou Editora inválidos" });
             if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" });
             if (!editoraEncontrada) return res.status(404).send({ message: "Editora não encontrada" });
 
-            const livroCompleto = {
+            const livroCriado = await Livro.create({
                 titulo,
-                editora: { ...editoraEncontrada._doc },
+                editora,
                 paginas,
                 preco,
-                autor: { ...autorEncontrado._doc }
-            };
-            const livroCriado = await Livro.create(livroCompleto);
+                autor
+            });
+
             return res.status(201).json({
                 message: "Livro criado com sucesso",
                 livro: livroCriado,
             });
         } catch (err) {
-            res.status(500).json({
+            return res.status(500).json({
                 message: "Erro ao criar livro",
                 error: err.message,
             });
@@ -59,49 +72,61 @@ export default class LivroController {
     };
 
     static async deletar(req, res) {
-        const id = req.params.id;
         try {
+            const id = req.params.id;
+            if (!validarObjectId(id)) return res.status(400).json({ message: "ID inválido" });
+
             const data = await Livro.deleteOne({ _id: id });
-            if (data.deletedCount === 0) {
-                return res.status(404).json({ message: "Livro não encontrado" });
-            }
+            if (data.deletedCount === 0) return res.status(404).json({ message: "Livro não encontrado" });
+
             return res.status(200).json({ message: "Livro deletado com sucesso" });
         } catch (err) {
-            res.status(500).json({
-                message: `Erro ao deletar livro: ${id}`,
+            return res.status(500).json({
+                message: "Erro ao deletar livro",
                 error: err.message
             });
         }
     };
 
     static async editar(req, res) {
-        const id = req.params.id;
-        const { titulo, editora, paginas, preco } = req.body;
         try {
+            const { titulo, editora, paginas, preco } = req.body;
+
+            const id = req.params.id;
+            
+            if (!validarObjectId(id)) return res.status(400).json({ message: "ID inválido" });
+            if (editora && !validarObjectId(editora))  return res.status(400).json({ message: "ID de editora inválido" });
+
             const data = await Livro.findByIdAndUpdate(
                 id,
                 { titulo, editora, paginas, preco },
                 { new: true }
             );
-            if (!data) {
-                return res.status(404).json({ message: "Livro não encontrado" });
-            }
+
+            if (!data) return res.status(404).json({ message: "Livro não encontrado" });
+
             return res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
-                message: `Erro ao atualizar livro: ${id}`,
+            return res.status(500).json({
+                message: "Erro ao atualizar livro",
                 error: err.message
             });
         }
     }
 
     static async listarPorEditora(req, res) {
-        const editora = req.query.editora;
         try {
-            const livrosPorEditora = await Livro.find({ "editora.nome": editora });
+            const editoraId = req.query.editora;
+
+            if (!validarObjectId(editoraId)) return res.status(400).json({ message: "ID de editora inválido" });
+
+            const livrosPorEditora = await Livro.find({ editora: editoraId })
+                .populate("autor")
+                .populate("editora");
+
             return res.status(200).json(livrosPorEditora);
         } catch (err) {
-            res.status(500).json({
+            return res.status(500).json({
                 message: "Erro ao listar livros",
                 error: err.message
             });

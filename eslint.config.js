@@ -1,7 +1,8 @@
 import js from "@eslint/js";
 import globals from "globals";
+import { defineConfig } from "eslint/config";
 
-export default [
+export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs}"],
     languageOptions: {
@@ -15,5 +16,7 @@ export default [
       quotes: ["error", "double"],
       "no-template-curly-in-string": "warn",
     },
+    plugin: { js },
+    extends: ["js/recommended"]
   },
-];
+]);

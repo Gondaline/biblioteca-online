@@ -16,7 +16,5 @@ export default defineConfig([
       quotes: ["error", "double"],
       "no-template-curly-in-string": "warn",
     },
-    plugin: { js },
-    extends: ["js/recommended"]
   },
 ]);

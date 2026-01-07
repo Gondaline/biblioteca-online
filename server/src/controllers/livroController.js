@@ -13,7 +13,7 @@ export default class LivroController {
 
             return res.status(200).json(data);
         } catch (err) {
-            return res.status(500).send({
+            return res.status(500).json({
                 message: "Erro ao consultar livros",
                 error: err.message
             });

@@ -4,13 +4,11 @@ export default class AutorController {
 
     static async listar(req, res) {
         try {
-            const data = await Autor.find()
-                .populate("autor")
-                .populate("editora")
-                .exec();
+            const data = await Autor.find();
+                
             return res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
+            return res.status(500).json({
                 message: "Erro ao consultar autores",
                 error: err.message,
             });
@@ -20,9 +18,7 @@ export default class AutorController {
     static async listarID(req, res) {
         try {
             const id = req.params.id;
-            const data = await Autor.findById(id)
-                .populate("autor")
-                .populate("editora");
+            const data = await Autor.findById(id);
             return res.status(200).json(data);
         } catch (err) {
             res.status(500).json({

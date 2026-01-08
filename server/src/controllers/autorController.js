@@ -2,33 +2,28 @@ import Autor from "../models/Autor.js";
 
 export default class AutorController {
 
-    static async listar(req, res) {
+    static async listar(req, res, next) {
         try {
             const data = await Autor.find();
-                
-            return res.status(200).json(data);
+            res.status(200).json(data);
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao consultar autores",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async listarID(req, res) {
+    static async listarID(req, res, next) {
         try {
             const id = req.params.id;
             const data = await Autor.findById(id);
-            return res.status(200).json(data);
+            if (!data) return res.status(404).json({ message: "ID do Autor não localizado" });
+            
+            res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
-                message: "Erro ao consultar autor",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async adicionar(req, res) {
+    static async adicionar(req, res, next) {
         const { nome, nacionalidade, qtd_livros_publicados } = req.body;
         try {
             const data = await Autor.create({
@@ -36,51 +31,41 @@ export default class AutorController {
                 nacionalidade,
                 qtd_livros_publicados
             });
-            return res.status(201).json({
+
+            res.status(201).json({
                 message: "Autor criado com sucesso",
                 autor: data
             });
         } catch (err) {
-            res.status(500).json({
-                message: "Erro ao criar autor",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async deletar(req, res) {
-        const id = req.params.id;
+    static async deletar(req, res, next) {
         try {
+            const id = req.params.id;
             const data = await Autor.deleteOne({ _id: id });
-            if (data.deletedCount === 0) {
-                return res.status(404).json({ message: "Autor não encontrado" });
-            }
-            return res.status(200).json({ message: "Autor deletado com sucesso" });
+            if (data.deletedCount === 0) return res.status(404).json({ message: "Autor não encontrado" });
+
+            res.status(200).json({ message: "Autor deletado com sucesso" });
         } catch (err) {
-            res.status(500).json({
-                message: `Erro ao deletar autor: ${id}`,
-                error: err.message
-            });
+            next(err);
         }
     };
 
-    static async editar(req, res) {
-        const id = req.params.id;
-        const { nome, nacionalidade, qtd_livros_publicados } = req.body;
+    static async editar(req, res, next) {
         try {
+            const id = req.params.id;
+            const { nome, nacionalidade, qtd_livros_publicados } = req.body;
             const data = await Autor.findByIdAndUpdate(
                 id,
                 { nome, nacionalidade, qtd_livros_publicados },
                 { new: true });
-            if (!data) {
-                return res.status(404).json({ message: "Autor não encontrado" });
-            }
-            return res.status(200).json(data);
+
+            if (!data) return res.status(404).json({ message: "Autor não encontrado" });
+            res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
-                message: `Erro ao editar autor: ${id}`,
-                error: err.message
-            });
+            next(err);
         }
     };
 };

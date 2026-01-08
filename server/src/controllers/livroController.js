@@ -5,22 +5,19 @@ import validarObjectId from "../auxilies/validarObjectId.js";
 
 export default class LivroController {
 
-    static async listar(req, res) {
+    static async listar(req, res, next) {
         try {
             const data = await Livro.find()
                 .populate("autor")
                 .populate("editora");
 
-            return res.status(200).json(data);
+            res.status(200).json(data);
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao consultar livros",
-                error: err.message
-            });
+            next(err);
         }
     };
 
-    static async listarPorID(req, res) {
+    static async listarPorID(req, res, next) {
         try {
             const id = req.params.id;
             if (!validarObjectId(id)) return res.status(400).json({ message: "ID inválido" });
@@ -28,26 +25,23 @@ export default class LivroController {
             const data = await Livro.findById(id)
                 .populate("autor")
                 .populate("editora");
-
             if (!data) return res.status(404).json({ message: "Livro não encontrado" });
 
             return res.status(200).json(data);
-
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao consultar livro",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async adicionar(req, res) {
+    static async adicionar(req, res, next) {
         try {
             const { titulo, editora, paginas, preco, autor } = req.body;
+
+            if (!validarObjectId(autor) || !validarObjectId(editora)) return res.status(400).json({ message: "Autor ou Editora inválidos" });
+
             const autorEncontrado = await Autor.findById(autor);
             const editoraEncontrada = await Editora.findById(editora);
 
-            if (!validarObjectId(autor) || !validarObjectId(editora)) return res.status(400).json({ message: "Autor ou Editora inválidos" });
             if (!autorEncontrado) return res.status(404).send({ message: "Autor não encontrado" });
             if (!editoraEncontrada) return res.status(404).send({ message: "Editora não encontrada" });
 
@@ -59,77 +53,68 @@ export default class LivroController {
                 autor
             });
 
-            return res.status(201).json({
+            res.status(201).json({
                 message: "Livro criado com sucesso",
                 livro: livroCriado,
             });
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao criar livro",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async deletar(req, res) {
+    static async deletar(req, res, next) {
         try {
             const id = req.params.id;
             if (!validarObjectId(id)) return res.status(400).json({ message: "ID inválido" });
 
-            const data = await Livro.deleteOne({ _id: id });
-            if (data.deletedCount === 0) return res.status(404).json({ message: "Livro não encontrado" });
+            const deleted = await Livro.findByIdAndDelete(id);
+            if (!deleted) return res.status(404).json({ message: "Livro não encontrado" });
 
-            return res.status(200).json({ message: "Livro deletado com sucesso" });
+            res.status(200).json({ message: "Livro deletado com sucesso" });
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao deletar livro",
-                error: err.message
-            });
+            next(err);
         }
     };
 
-    static async editar(req, res) {
+    static async editar(req, res, next) {
         try {
+            const update = {};
             const { titulo, editora, paginas, preco } = req.body;
-
             const id = req.params.id;
-            
+
             if (!validarObjectId(id)) return res.status(400).json({ message: "ID inválido" });
-            if (editora && !validarObjectId(editora))  return res.status(400).json({ message: "ID de editora inválido" });
+            if (editora && !validarObjectId(editora)) return res.status(400).json({ message: "ID de editora inválido" });
+
+            if (titulo !== undefined) update.titulo = titulo;
+            if (editora !== undefined) update.editora = editora;
+            if (paginas !== undefined) update.paginas = paginas;
+            if (preco !== undefined) update.preco = preco;
 
             const data = await Livro.findByIdAndUpdate(
                 id,
-                { titulo, editora, paginas, preco },
+                update,
                 { new: true }
             );
-
             if (!data) return res.status(404).json({ message: "Livro não encontrado" });
 
-            return res.status(200).json(data);
+            res.status(200).json(data);
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao atualizar livro",
-                error: err.message
-            });
+            next(err);
         }
     }
 
-    static async listarPorEditora(req, res) {
+    static async listarPorEditora(req, res, next) {
         try {
             const editoraId = req.query.editora;
-
-            if (!validarObjectId(editoraId)) return res.status(400).json({ message: "ID de editora inválido" });
+            if (!editoraId) return res.status(400).json({ message: "Parâmetro editora é obrigatório" });
 
             const livrosPorEditora = await Livro.find({ editora: editoraId })
                 .populate("autor")
                 .populate("editora");
 
-            return res.status(200).json(livrosPorEditora);
+            res.status(200).json(livrosPorEditora);
         } catch (err) {
-            return res.status(500).json({
-                message: "Erro ao listar livros",
-                error: err.message
-            });
+            next(err);
         }
     };
 };

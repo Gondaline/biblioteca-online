@@ -2,37 +2,29 @@ import Editora from "../models/Editora.js";
 
 export default class EditoraController {
 
-    static async listar(req, res) {
+    static async listar(req, res, next) {
         try {
-            const data = await Editora.find()
-                .populate("autor")
-                .populate("editora")
-                .exec();
-            return res.status(200).json(data);
+            const data = await Editora.find();
+
+            res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
-                message: "Erro ao consultar editoras",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async listarID(req, res) {
+    static async listarID(req, res, next) {
         try {
             const id = req.params.id;
-            const data = await Editora.findById(id)
-                .populate("autor")
-                .populate("editora");
-            return res.status(200).json(data);
+            const data = await Editora.findById(id);
+            if (!data) return res.status(404).json({ message: "ID da Editora não localizada" });
+
+            res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
-                message: "Erro ao consultar editora",
-                error: err.message,
-            });
+            next(err);
         }
     };
 
-    static async adicionar(req, res) {
+    static async adicionar(req, res, next) {
         const { nome, pais, anoFuncao } = req.body;
         try {
             const data = await Editora.create({
@@ -40,35 +32,28 @@ export default class EditoraController {
                 pais,
                 anoFuncao
             });
-            return res.status(201).json({
-                message: "Autor criado com sucesso",
+            res.status(201).json({
+                message: "Editora criada com sucesso",
                 editora: data
             });
         } catch (err) {
-            res.status(500).json({
-                message: "Erro ao criar editora",
-                error: err.message
-            });
+            next(err);
         }
     };
 
-    static async deletar(req, res) {
-        const id = req.params.id;
+    static async deletar(req, res, next) {
         try {
+            const id = req.params.id;
             const data = await Editora.deleteOne({ _id: id });
-            if (data.deletedCount === 0) {
-                return res.status(404).json({ message: "Editora não encontrada" });
-            }
-            return res.status(200).json({ message: "Editora deletada com sucesso" });
+            if (data.deletedCount === 0) return res.status(404).json({ message: "Editora não encontrada" });
+
+            res.status(200).json({ message: "Editora deletada com sucesso" });
         } catch (err) {
-            res.status(500).json({
-                message: `Erro ao deletar editora: ${id}`,
-                error: err.message
-            });
+            next(err);
         }
     };
 
-    static async editar(req, res) {
+    static async editar(req, res, next) {
         const id = req.params.id;
         const { nome, pais, anoFuncao } = req.body;
         try {
@@ -77,15 +62,11 @@ export default class EditoraController {
                 { nome, pais, anoFuncao },
                 { new: true }
             );
-            if (!data) {
-                return res.status(404).json({ message: "Editora não encontrada" });
-            }
-            return res.status(200).json(data);
+            if (!data) return res.status(404).json({ message: "Editora não encontrada" });
+
+            res.status(200).json(data);
         } catch (err) {
-            res.status(500).json({
-                message: `Erro ao atualizar editora: ${id}`,
-                error: err.message
-            });
+            next(err);
         }
     };
 };

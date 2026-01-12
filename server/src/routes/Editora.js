@@ -3,10 +3,11 @@ import EditoraController from "../controllers/editoraController.js";
 
 const router = Router();
 
-router.get("/", EditoraController.listar);
-router.get("/:id", EditoraController.listarID);
-router.post("/", EditoraController.adicionar);
-router.delete("/:id", EditoraController.deletar);
-router.put("/:id", EditoraController.editar);
+router
+    .get("/", EditoraController.listar)
+    .get("/:id", EditoraController.listarID)
+    .post("/", EditoraController.adicionar)
+    .put("/:id", EditoraController.editar)
+    .delete("/:id", EditoraController.deletar);
 
 export default router;

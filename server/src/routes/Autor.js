@@ -3,10 +3,11 @@ import AutorController from "../controllers/autorController.js";
 
 const router = Router();
 
-router.get("/", AutorController.listar);
-router.get("/:id", AutorController.listarID);
-router.post("/", AutorController.adicionar);
-router.delete("/:id", AutorController.deletar);
-router.put("/:id", AutorController.editar);
+router
+    .get("/", AutorController.listar)
+    .get("/:id", AutorController.listarID)
+    .post("/", AutorController.adicionar)
+    .put("/:id", AutorController.editar)
+    .delete("/:id", AutorController.deletar);
 
 export default router;

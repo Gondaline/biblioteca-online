@@ -1,4 +1,5 @@
 import Editora from "../models/Editora.js";
+import NaoEncontrado from "../erros/NaoEncontrado.js";
 
 export default class EditoraController {
 
@@ -16,7 +17,10 @@ export default class EditoraController {
         try {
             const id = req.params.id;
             const data = await Editora.findById(id);
-            if (!data) return res.status(404).json({ message: "ID da Editora não localizada" });
+            
+            if (!data) {
+                next(new NaoEncontrado("ID da Editora não localizado"));
+            }
 
             res.status(200).json(data);
         } catch (err) {
@@ -25,8 +29,9 @@ export default class EditoraController {
     };
 
     static async adicionar(req, res, next) {
-        const { nome, pais, anoFuncao } = req.body;
         try {
+            const { nome, pais, anoFuncao } = req.body;
+
             const data = await Editora.create({
                 nome,
                 pais,
@@ -45,7 +50,10 @@ export default class EditoraController {
         try {
             const id = req.params.id;
             const data = await Editora.deleteOne({ _id: id });
-            if (data.deletedCount === 0) return res.status(404).json({ message: "Editora não encontrada" });
+
+            if (data.deletedCount === 0) {
+                next(new NaoEncontrado("Editora não encontrada"));
+            }
 
             res.status(200).json({ message: "Editora deletada com sucesso" });
         } catch (err) {
@@ -62,7 +70,10 @@ export default class EditoraController {
                 { nome, pais, anoFuncao },
                 { new: true }
             );
-            if (!data) return res.status(404).json({ message: "Editora não encontrada" });
+
+            if (!data) {
+                next(new NaoEncontrado("Editora não encontrada"));
+            }
 
             res.status(200).json(data);
         } catch (err) {

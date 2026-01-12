@@ -1,3 +1,4 @@
+import NaoEncontrado from "../erros/NaoEncontrado.js";
 import Autor from "../models/Autor.js";
 
 export default class AutorController {
@@ -15,8 +16,11 @@ export default class AutorController {
         try {
             const id = req.params.id;
             const data = await Autor.findById(id);
-            if (!data) return res.status(404).json({ message: "ID do Autor não localizado" });
-            
+
+            if (!data) {
+                next(new NaoEncontrado("ID do Autor não localizado"));
+            }
+
             res.status(200).json(data);
         } catch (err) {
             next(err);
@@ -24,8 +28,8 @@ export default class AutorController {
     };
 
     static async adicionar(req, res, next) {
-        const { nome, nacionalidade, qtd_livros_publicados } = req.body;
         try {
+            const { nome, nacionalidade, qtd_livros_publicados } = req.body;
             const data = await Autor.create({
                 nome,
                 nacionalidade,
@@ -45,7 +49,10 @@ export default class AutorController {
         try {
             const id = req.params.id;
             const data = await Autor.deleteOne({ _id: id });
-            if (data.deletedCount === 0) return res.status(404).json({ message: "Autor não encontrado" });
+
+            if (data.deletedCount === 0) {
+                next(new NaoEncontrado("Autor não encontrado"));
+            }
 
             res.status(200).json({ message: "Autor deletado com sucesso" });
         } catch (err) {
@@ -62,7 +69,10 @@ export default class AutorController {
                 { nome, nacionalidade, qtd_livros_publicados },
                 { new: true });
 
-            if (!data) return res.status(404).json({ message: "Autor não encontrado" });
+            if (!data) {
+                next(new NaoEncontrado("Autor não encontrado"));
+            }
+
             res.status(200).json(data);
         } catch (err) {
             next(err);

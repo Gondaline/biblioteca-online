@@ -3,11 +3,12 @@ import LivroController from "../controllers/livroController.js";
 
 const router = Router();
 
-router.get("/", LivroController.listar);
-router.get("/busca", LivroController.listarPorEditora);
-router.get("/:id", LivroController.listarPorID);
-router.post("/", LivroController.adicionar);
-router.delete("/:id", LivroController.deletar);
-router.put("/:id", LivroController.editar);
+router
+    .get("/", LivroController.listar)
+    .get("/busca", LivroController.listarPorEditora)
+    .get("/:id", LivroController.listarPorID)
+    .post("/", LivroController.adicionar)
+    .put("/:id", LivroController.editar)
+    .delete("/:id", LivroController.deletar)
 
 export default router;
